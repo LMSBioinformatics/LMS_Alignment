@@ -7,7 +7,7 @@ This course introduces some of the fundamental concepts and tools available for 
 
 Each section is presented as both HTMl and Rpres markdown ( to allow for intergration of the presentation in the RStudio enviroment itself).  Exercises and answer sheets are included after all subsections to practice techniques and provide future reference examples. 
 
-Course material and exercises are available to view as rendered HTML slides or single page HTML at [http://mrccsc.github.io/RNAseq_short/](http://mrccsc.github.io/RNAseq_short/).  
+Course material and exercises are available to view as rendered HTML slides or single page HTML at [http://mrccsc.github.io/Alignment/](http://mrccsc.github.io/Alignment/).  
 All material is available to download under GPL v3 license.
 
 For  information on other courses run by our team see our [github IO page](http://mrccsc.github.io/training.html).
@@ -44,13 +44,13 @@ To install these,
 * Install the packages in the R console
 <pre>
 source("https://bioconductor.org/biocLite.R")
-biocLite("GenomicRanges")
+biocLite(c("Rbowtie","ShortRead","GenomicAlignments","Rsamtools"))
 </pre>
 
 #### Download the material
-The material can either be downloaded as a [zip](https://github.com/mrccsc/Bioconductor/archive/master.zip)
+The material can either be downloaded as a [zip](https://github.com/mrccsc/Alignment/archive/master.zip)
 <pre>
-wget https://github.com/mrccsc/Bioconductor/archive/master.zip ./
+wget https://github.com/mrccsc/Alignment/archive/master.zip ./
 </pre>
 or checked out from our Github repository
-https://github.com/mrccsc/Bioconductor/
+https://github.com/mrccsc/Alignment
