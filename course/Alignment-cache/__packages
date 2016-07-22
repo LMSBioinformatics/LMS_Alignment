@@ -1,0 +1,16 @@
+base
+knitr
+BiocGenerics
+BiocParallel
+S4Vectors
+IRanges
+XVector
+Biostrings
+GenomeInfoDb
+GenomicRanges
+Rsamtools
+Biobase
+SummarizedExperiment
+GenomicAlignments
+ShortRead
+Rbowtie

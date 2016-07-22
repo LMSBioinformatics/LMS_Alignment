@@ -1,0 +1,16 @@
+---
+title: "Alignment Exercises 1"
+author: "Gopuraja Dharmalingam"
+date: "20 July 2016"
+output: html_document
+---
+
+----
+```{r echo=FALSE, eval=TRUE, warning=FALSE}
+
+```
+
+
+# Exercises
+
+1. Import the fastq files and assess the quality using ShortRead

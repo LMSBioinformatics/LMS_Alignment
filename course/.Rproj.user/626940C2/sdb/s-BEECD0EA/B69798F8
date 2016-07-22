@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Bioconductor Exercises Part2\"\nauthor: \"MRC CSC Bioinformatics Core Team\"\ndate: \"19 July 2016\"\noutput: html_document\n---\n\n----\n```{r echo=FALSE, eval=TRUE, warning=FALSE}\n\n```\n\n\n# Solutions\n\n* Download the following BAM and index files (*.bai) (ENCODE data - ChIP-Seq of CTCF in Ag04449 human fibroblast cells)\n    - http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeUwTfbs/wgEncodeUwTfbsAg04449CtcfStdAlnRep1.bam\n    - http://hgdownload.cse.ucsc.edu/goldenPath/hg19/encodeDCC/wgEncodeUwTfbs/wgEncodeUwTfbsAg04449CtcfStdAlnRep1.bam.bai\n* Use `readGAlignments` to read the bam. Construct an `ScanBamParam` object that accepts only aligned reads, passing quality control and not duplicates.\n* Compute genome wide coverage using `coverage` function\n* Export coverage as bigWig using `export.bw()` from rtracklayer package and visualise it using IGV\n* Compute number of reads overlapping with hg19 promoters (TSS ± 1kb) and export the results as text file.\n\n```{r, echo=TRUE, eval=FALSE, message=FALSE, collapse=TRUE}\nlibrary(\"GenomicAlignments\")\nlibrary(\"rtracklayer\")\nbamFile <- \"wgEncodeUwTfbsAg04449CtcfStdAlnRep1.bam\"\nflag <- scanBamFlag()\nparam <- ScanBamParam(\n    flag=scanBamFlag(isUnmappedQuery=FALSE, isDuplicate=FALSE, isNotPassingQualityControls=FALSE)\n    )\n\n# Read the BAM\nCTCF <- readGAlignments(bamFile,param=param)\n\n# Generate the genomic coverage and inspect the output\nCTCFCov <- coverage(CTCF)\n\n# Export as bigWig\nexport.bw(CTCFCov, \"Ag04449_CTCF.bw\")\n\n# Identifying hg19 promoters\nhg19Gene <- read.table(\"hg19Genes.txt\",sep=\"\\t\",header=T)\nhg19Gene.GR <- GRanges(seqnames=hg19Gene$chr,\n                       ranges=IRanges(start=hg19Gene$start,end=hg19Gene$end),\n                       strand=ifelse(hg19Gene$strand==1,\"+\",\"-\"),\n                       EnsemblID=hg19Gene$ensID,\n                       Symbol=hg19Gene$GeneSym)\nhg19Promoters <- promoters(hg19Gene.GR,upstream=2000,downstream=2000)\n\n# Reads overlapping with promoters\nCTCFCounts <- countOverlaps(hg19Promoters,CTCF)\n\n# Add CTCF counts as elementMetadata to hg19Promoters object\nmcols(hg19Promoters)$CTCF <- CTCFCounts\n\n# Export the results as text file\nhg19Promoters.df <- as.data.frame(hg19Promoters)\nwrite.table(hg19Promoters.df,\"hg19Promoters_CTCF.txt\",sep=\"\\t\",row.names=F)\n\n```\n\n",
+    "created" : 1469198001155.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4087379275",
+    "id" : "B69798F8",
+    "lastKnownWriteTime" : 1468927030,
+    "last_content_update" : 1468927030,
+    "path" : "~/Documents/ComputionalBiologyWorkshop/2016/Bioconductor/course/Bioconductor_Exercises_Part2_solutions.Rmd",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
