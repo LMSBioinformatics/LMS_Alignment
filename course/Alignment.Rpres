@@ -247,6 +247,15 @@ Aligning sequences with Rbowtie
 - ChIPseq of CTCF, bone marrow macrophage (Mus musculus) from ENCODE (https://www.encodeproject.org/experiments/ENCSR000CFJ/)
 - Reads from chr1 used for this exercise
 
+Aligning sequences with Rbowtie
+========================================================
+
+## Downloading data
+
+https://fileexchange.imperial.ac.uk/pickup.php?claimID=VVn5hRvcus9pT9qA&claimPasscode=feX5sYh9GRUWT9Hd&emailAddr=gdharmal%40imperial.ac.uk
+
+- Download the zip and unzip under "course" directory (this will create a new directory "Data")
+
 
 Aligning sequences with Rbowtie
 ========================================================
@@ -537,10 +546,95 @@ Reading Sequence alignments (BAM/SAM)
 ========================================================
 
 We can also customise which regions to read
+
 ```{r, echo=TRUE, eval=TRUE,  message=FALSE, cache=T}
 region <- GRanges("chr1",IRanges(3000000,5000000))
 param1 <- ScanBamParam(what=c("rname", "pos", "cigar","qwidth"),which=region, flag=scanBamFlag(isUnmappedQuery=FALSE, isDuplicate=FALSE, isNotPassingQualityControls=FALSE))
 SampleAlign1 <- readGAlignments(bamin,param=param1)
+```
+
+
+Overlap Counting
+========================================================
+
+- Counting number of reads overlap with exons (RNA-Seq)
+- Counting number of reads overalpping with promoters or peaks in ChIP-Seq
+
+<br><br>
+
+- <b>countOverlaps()</b> from `GenomicRanges` package
+- <b>summarizeOverlaps()</b> from `GenomicAlignments` package
+
+
+Overlap Counting - countOvrelaps()
+========================================================
+
+- <b>countOverlaps()</b> tabulates number of subject intervals overlap with each interval in query, ex: counting number of sequencing reads overlap with genes in RNA-Seq
+
+- countOverlaps(FeatureGR, AlignmentsGR)
+
+### Counting number of reads overlapping with promoters 
+
+```{r, echo=TRUE, eval=TRUE,  message=FALSE, cache=T}
+library("biomaRt")
+ensembl <- useMart("ENSEMBL_MART_ENSEMBL", host = "may2012.archive.ensembl.org") # select ensembl
+ens_mouse <- useDataset("mmusculus_gene_ensembl",mart=ensembl) # select human dataset
+mm9Genes <- getBM(attributes = c("chromosome_name","start_position","end_position","ensembl_gene_id","strand","external_gene_id"), filter="chromosome_name",values=c("1","2"), mart=ens_mouse)
+# add 'chr' prefix to chromosome name
+mm9Genes$chromosome_name <- paste("chr",mm9Genes$chromosome_name,sep="")
+head(mm9Genes)
+```
+
+
+Overlap Counting - countOvrelaps()
+========================================================
+
+```{r, echo=TRUE, eval=TRUE,  message=FALSE, cache=T}
+mm9Genes.GR <- GRanges(seqnames=mm9Genes$chr,
+                       ranges=IRanges(start=mm9Genes$start_position,end=mm9Genes$start_position),
+                       strand=ifelse(mm9Genes$strand==1,"+","-"),
+                       EnsemblID=mm9Genes$ensembl_gene_id,
+                       Symbol=mm9Genes$external_gene_id)
+mm9Promoters <- promoters(mm9Genes.GR,upstream=1000,downstream=1000)
+
+# Reads overlapping with promoters
+CTCFCounts <- countOverlaps(mm9Promoters, SampleAlign)
+
+# Add CTCF counts as elementMetadata to hg19Promoters object
+mcols(mm9Promoters)$CTCF <- CTCFCounts
+
+```
+
+
+
+Overlap Counting - summarizeOverlaps()
+========================================================
+
+- Extends `countOverlaps()` by providing options to handle multiple BAMs and to handle reads overlap with multiple features
+- Features can be genes, exons, transcripts or any region of interest
+- Features can be GRanges or GRangesList
+- Accepts `ScanBamParam` object to subset the input BAMs
+
+### Counting modes
+- Union: Count if read hits any part of one feature, else discard
+- IntersectionStrict: Count if reads falls completely within in one feature, else discard
+- IntersectionNotEmpty: Count if read falls in a unique disjoint region of a feature, else drop
+
+
+Overlap Counting - summarizeOverlaps()
+========================================================
+
+### Counting Reads on transcripts for RNA-Seq 
+```{r, echo=TRUE, eval=FALSE, message=FALSE}
+library("TxDb.Mmusculus.UCSC.mm9.knownGene")
+txdb <- TxDb.Mmusculus.UCSC.mm9.knownGene
+transcriptsGR <- genes(txdb)
+transcriptsGR <- transcriptsGR[seqnames(transcriptsGR) == "chr1"]
+
+
+BamFiles <-  BamFileList("Data/ENCFF001QSC_chr1.bam", yieldSize = 100000)
+TranscriptHits <- summarizeOverlaps(transcriptsGR, BamFiles, mode="Union", ignore.strand = T)
+
 ```
 
 

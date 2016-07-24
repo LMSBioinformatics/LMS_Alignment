@@ -1135,6 +1135,20 @@ browseURL(report(qaSummary))
 <section data-transition="linear" data-transition-speed="default">
 <h3>Aligning sequences with Rbowtie</h3>
 <div class="slideContent" >
+<h2>Downloading data</h2>
+
+<p><a href="https://fileexchange.imperial.ac.uk/pickup.php?claimID=VVn5hRvcus9pT9qA&amp;claimPasscode=feX5sYh9GRUWT9Hd&amp;emailAddr=gdharmal%40imperial.ac.uk">https://fileexchange.imperial.ac.uk/pickup.php?claimID=VVn5hRvcus9pT9qA&amp;claimPasscode=feX5sYh9GRUWT9Hd&amp;emailAddr=gdharmal%40imperial.ac.uk</a></p>
+
+<ul>
+<li>Download the zip and unzip under &ldquo;course&rdquo; directory (this will create a new directory &ldquo;Data&rdquo;)</li>
+</ul>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Aligning sequences with Rbowtie</h3>
+<div class="slideContent" >
 <h3>Building Index for the genome</h3>
 
 <h4>Help for building index: bowtie_build_usage()</h4>
@@ -1640,6 +1654,121 @@ SampleAlign
 <pre><code class="r">region &lt;- GRanges(&quot;chr1&quot;,IRanges(3000000,5000000))
 param1 &lt;- ScanBamParam(what=c(&quot;rname&quot;, &quot;pos&quot;, &quot;cigar&quot;,&quot;qwidth&quot;),which=region, flag=scanBamFlag(isUnmappedQuery=FALSE, isDuplicate=FALSE, isNotPassingQualityControls=FALSE))
 SampleAlign1 &lt;- readGAlignments(bamin,param=param1)
+</code></pre>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Overlap Counting</h3>
+<div class="slideContent" >
+<ul>
+<li>Counting number of reads overlap with exons (RNA-Seq)</li>
+<li>Counting number of reads overalpping with promoters or peaks in ChIP-Seq</li>
+</ul>
+
+<p><br><br></p>
+
+<ul>
+<li><b>countOverlaps()</b> from <code>GenomicRanges</code> package</li>
+<li><b>summarizeOverlaps()</b> from <code>GenomicAlignments</code> package</li>
+</ul>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Overlap Counting - countOvrelaps()</h3>
+<div class="slideContent" >
+<ul>
+<li><p><b>countOverlaps()</b> tabulates number of subject intervals overlap with each interval in query, ex: counting number of sequencing reads overlap with genes in RNA-Seq</p></li>
+<li><p>countOverlaps(FeatureGR, AlignmentsGR)</p></li>
+</ul>
+
+<h3>Counting number of reads overlapping with promoters</h3>
+
+<pre><code class="r">library(&quot;biomaRt&quot;)
+ensembl &lt;- useMart(&quot;ENSEMBL_MART_ENSEMBL&quot;, host = &quot;may2012.archive.ensembl.org&quot;) # select ensembl
+ens_mouse &lt;- useDataset(&quot;mmusculus_gene_ensembl&quot;,mart=ensembl) # select human dataset
+mm9Genes &lt;- getBM(attributes = c(&quot;chromosome_name&quot;,&quot;start_position&quot;,&quot;end_position&quot;,&quot;ensembl_gene_id&quot;,&quot;strand&quot;,&quot;external_gene_id&quot;), filter=&quot;chromosome_name&quot;,values=c(&quot;1&quot;,&quot;2&quot;), mart=ens_mouse)
+# add &#39;chr&#39; prefix to chromosome name
+mm9Genes$chromosome_name &lt;- paste(&quot;chr&quot;,mm9Genes$chromosome_name,sep=&quot;&quot;)
+head(mm9Genes)
+</code></pre>
+
+<pre><code>  chromosome_name start_position end_position    ensembl_gene_id strand
+1            chr1       65233324     65320586 ENSMUSG00000025949      1
+2            chr1       65328630     65435818 ENSMUSG00000025946      1
+3            chr1       65973096     65974881 ENSMUSG00000025945      1
+4            chr1       66221847     66489157 ENSMUSG00000015222      1
+5            chr1       66514941     66746440 ENSMUSG00000055567      1
+6            chr1       66747405     66766379 ENSMUSG00000026005      1
+  external_gene_id
+1          Pikfyve
+2            Pth2r
+3            Crygf
+4            Mtap2
+5            Unc80
+6              Rpe
+</code></pre>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Overlap Counting - countOvrelaps()</h3>
+<div class="slideContent" >
+<pre><code class="r">mm9Genes.GR &lt;- GRanges(seqnames=mm9Genes$chr,
+                       ranges=IRanges(start=mm9Genes$start_position,end=mm9Genes$start_position),
+                       strand=ifelse(mm9Genes$strand==1,&quot;+&quot;,&quot;-&quot;),
+                       EnsemblID=mm9Genes$ensembl_gene_id,
+                       Symbol=mm9Genes$external_gene_id)
+mm9Promoters &lt;- promoters(mm9Genes.GR,upstream=1000,downstream=1000)
+
+# Reads overlapping with promoters
+CTCFCounts &lt;- countOverlaps(mm9Promoters, SampleAlign)
+
+# Add CTCF counts as elementMetadata to hg19Promoters object
+mcols(mm9Promoters)$CTCF &lt;- CTCFCounts
+</code></pre>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Overlap Counting - summarizeOverlaps()</h3>
+<div class="slideContent" >
+<ul>
+<li>Extends <code>countOverlaps()</code> by providing options to handle multiple BAMs and to handle reads overlap with multiple features</li>
+<li>Features can be genes, exons, transcripts or any region of interest</li>
+<li>Features can be GRanges or GRangesList</li>
+<li>Accepts <code>ScanBamParam</code> object to subset the input BAMs</li>
+</ul>
+
+<h3>Counting modes</h3>
+
+<ul>
+<li>Union: Count if read hits any part of one feature, else discard</li>
+<li>IntersectionStrict: Count if reads falls completely within in one feature, else discard</li>
+<li>IntersectionNotEmpty: Count if read falls in a unique disjoint region of a feature, else drop</li>
+</ul>
+
+</div>
+
+</section>
+<section data-transition="linear" data-transition-speed="default">
+<h3>Overlap Counting - summarizeOverlaps()</h3>
+<div class="slideContent" >
+<h3>Counting Reads on transcripts for RNA-Seq</h3>
+
+<pre><code class="r">library(&quot;TxDb.Mmusculus.UCSC.mm9.knownGene&quot;)
+txdb &lt;- TxDb.Mmusculus.UCSC.mm9.knownGene
+transcriptsGR &lt;- genes(txdb)
+transcriptsGR &lt;- transcriptsGR[seqnames(transcriptsGR) == &quot;chr1&quot;]
+
+
+BamFiles &lt;-  BamFileList(&quot;Data/ENCFF001QSC_chr1.bam&quot;, yieldSize = 100000)
+TranscriptHits &lt;- summarizeOverlaps(transcriptsGR, BamFiles, mode=&quot;Union&quot;, ignore.strand = T)
 </code></pre>
 
 </div>
