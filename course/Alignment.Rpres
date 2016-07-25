@@ -34,6 +34,14 @@ Overview
 * [Visualisation](#/vis)
 
 
+Downloading data
+========================================================
+
+https://fileexchange.imperial.ac.uk/pickup.php?claimID=EBh3VQ3xQKZCcCqY&claimPasscode=g8iANNiTrwdDJiod&emailAddr=gdharmal%40imperial.ac.uk
+
+- Download the zip and unzip under "course" directory (this will create a new directory "Data")
+
+
 
 Introduction to Seqeuncing Technology
 ========================================================
@@ -41,7 +49,15 @@ id: Intro
 
 Illumina - Sequencing by synthesis
 
-[Figure]
+![Illumina](./images/Illumina.png)
+
+
+Introduction to Seqeuncing Technology
+========================================================
+
+![Illumina](./images/Illumina2.png)
+
+
 
 
 Introduction to Seqeuncing Technology
@@ -261,16 +277,6 @@ Aligning sequences with Rbowtie
 Aligning sequences with Rbowtie
 ========================================================
 
-## Downloading data
-
-https://fileexchange.imperial.ac.uk/pickup.php?claimID=EBh3VQ3xQKZCcCqY&claimPasscode=g8iANNiTrwdDJiod&emailAddr=gdharmal%40imperial.ac.uk
-
-- Download the zip and unzip under "course" directory (this will create a new directory "Data")
-
-
-Aligning sequences with Rbowtie
-========================================================
-
 ### Building Index for the genome
 
 #### Help for building index: bowtie_build_usage()
@@ -307,10 +313,11 @@ Aligning sequences with Rbowtie
 
 bowtie(sequences="Data/ENCFF001LGM_chr1.fastq",
        index=file.path("Data", "mm9index_chr1"), 
-       outfile="Data/CTCF_mm9_MF.sam", 
+       outfile="Data/CTCF_mm9_MF.sam",
        sam=TRUE, 
        best=TRUE, 
        force=TRUE,
+       threads=2,
        type="single", m=1
        )
 
@@ -336,7 +343,7 @@ Spliced Alignment using SpliceMap
 
 
 ### Data
-- RNA-Seq of NIH3T3 (Mus musculus) from ENCODE: https://www.encodeproject.org/experiments/ENCSR000CLW/
+- RNA-Seq of Liver (Mus musculus E12.5) from ENCODE: https://www.encodeproject.org/experiments/ENCSR648YEP/
 - Single end
 - Reads from chr1 used for this exercise
 
@@ -347,10 +354,10 @@ Spliced Alignment using SpliceMap
 ### Aligning the sequences using SpliceMap
 
 ```{r, echo=TRUE, eval=FALSE, message=FALSE}
-readsFiles <- "Data/ENCFF001QSC_chr1.fastq"
+readsFiles <- "Data/ENCFF905YGD_chr1.fastq"
 refDir <- "Data/chr1.fa"
 indexDir <- file.path(tempdir(), "refsIndex")
-samFiles <- "Data/ENCFF001QSC_chr1.sam"
+samFiles <- "Data/ENCFF905YGD_chr1.sam"
 cfg <- list(genome_dir=refDir,
             reads_list1=readsFiles,
             read_format="FASTQ",
@@ -363,7 +370,7 @@ cfg <- list(genome_dir=refDir,
             read_mismatch=2,
             num_chromosome_together=2,
             bowtie_base_dir="Data/mm9index_chr1",
-            num_threads=2,
+            num_threads=4,
             try_hard="yes",
             selectSingleHit=TRUE)
 res <- SpliceMap(cfg)
@@ -475,13 +482,13 @@ Summary & Post-Alignment QC
 
 ### Using samtools
 ```{r, echo=TRUE, eval=FALSE, message=FALSE}
-samtools flagstat in.bam
+samtools flagstat CTCF_mm9_MF.bam
 ```
 
 ```{r, echo=TRUE, eval=FALSE, message=FALSE}
 975396 + 0 in total (QC-passed reads + QC-failed reads)
 0 + 0 duplicates
-967421 + 0 mapped (99.18%:nan%)
+967484 + 0 mapped (99.19%:nan%)
 0 + 0 paired in sequencing
 0 + 0 read1
 0 + 0 read2
@@ -661,7 +668,7 @@ Overlap Counting - summarizeOverlaps()
 transcriptsGR <- transcripts(txdb)
 transcriptsGR <- transcriptsGR[seqnames(transcriptsGR) == "chr1"] # transcripts in chr1
 
-BamFilesIn <-  BamFileList("Data/ENCFF001QSC_chr1.bam", yieldSize = 100000)
+BamFilesIn <-  BamFileList("Data/ENCFF905YGD_chr1.bam", yieldSize = 100000)
 TranscriptHits <- summarizeOverlaps(transcriptsGR, BamFilesIn, mode="Union", ignore.strand = T)
 
 ```
@@ -680,6 +687,23 @@ head(assays(TranscriptHits)$counts)
 ```
 
 
+Reads on Exon-Exon Junctions
+========================================================
+
+- How many reads overlapping with exon-exon junctions
+```{r, echo=TRUE, eval=TRUE, message=FALSE, cache =T, collapse=TRUE}
+bamin <- "Data/ENCFF905YGD_chr1.bam"
+SampleRNASeqAlign <- readGAlignments(bamin)
+
+sum(cigarOpTable(cigar(SampleRNASeqAlign))[,"N"] > 0)
+
+```
+
+- Inspecting reads overlapping with exon-exon junctions
+```{r, echo=TRUE, eval=TRUE, message=FALSE, cache =T, collapse=TRUE}
+SampleRNASeqAlign[cigarOpTable(cigar(SampleRNASeqAlign))[,"N"] > 0,]
+```
+
 
 Visualisation - Genomewide coverage
 ========================================================
@@ -689,7 +713,6 @@ id: vis
 
 Visualisation - Genomewide coverage
 ========================================================
-
 
 `coverage()` calculates how many ranges overlap with individual positions in the genome. <b>coverage</b> function returns the coverage as Rle instance.
 ```{r, echo=TRUE, eval=TRUE,  message=FALSE}

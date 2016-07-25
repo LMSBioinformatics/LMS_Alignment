@@ -1,0 +1,41 @@
+---
+title: "Alignment Exercises 2"
+author: "MRC CSC Bioinformatics Core Team"
+date: "27 July 2016"
+output: html_document
+---
+
+----
+```{r echo=FALSE, eval=TRUE, warning=FALSE}
+
+```
+
+
+# Exercises
+<br><br>
+
+#### Note: Files are in "Data" directory
+
+
+1. Builld Bowtie index for chr1 and chr2 using "chr1.fa" and "chr2.fa" (chr1 and chr2 of Mus musculus genome version mm9)
+
+2. Align "ENCFF001LGM_chr1_chr2.fastq" (CTCF, bone marrow macrophage, Mus musculus) against mm9 genome using `Rbowtie`using below parameters
+    + Trim 2 bases on 5' end of reads
+    + Allow up to 3 alignments per read
+    + Output the alignments in SAM
+    + Use 4 CPU threads to align
+    + Convert the SAM to BAM, sort and Index.
+    + Visualise the BAM using IGV
+
+
+3. Align "ENCFF905YGD_chr2.fastq" (RNA-Seq of Liver Mus musculus)  `SpliceMap()`
+    + Set maximum mismatches allowed in the entire read to 4
+    + Use 4 CPU threads to align
+    + Report all alignments for each read
+    + Covert the SAM to BAM, sort and Index
+    + Visualise the BAM using IGV and insepct reads aligned over exons
+
+
+
+4. Examine the SAM header for the BAM generated in Q3 and find whether the BAM is sorted by coordinates or by readnames
+

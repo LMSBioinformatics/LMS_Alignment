@@ -1,0 +1,101 @@
+---
+title: "Alignment Exercises 2 Solutions"
+author: "MRC CSC Bioinformatics Core Team"
+date: "27 July 2016"
+output: html_document
+---
+
+----
+```{r echo=FALSE, eval=TRUE, warning=FALSE}
+
+```
+
+
+# Solutions
+
+
+1. Builld Bowtie index for chr1 and chr2 using "chr1.fa" and "chr2.fa" (chr1 and chr2 of Mus musculus genome version mm9)
+2. Align "ENCFF001LGM_chr1_chr2.fastq" (CTCF, bone marrow macrophage, Mus musculus) against mm9 genome using `Rbowtie`using below parameters
+    + Trim 2 bases on 5' end of reads
+    + Allow up to 3 alignments per read
+    + Output the alignments in SAM
+    + Use 4 CPU threads to align
+    + Convert the SAM to BAM, sort and Index.
+    + Visualise the BAM using IGV
+
+
+```{r, echo=TRUE, eval=FALSE, message=FALSE, collapse=TRUE, cache=TRUE}
+
+library(Rbowtie)
+library(Rsamtools)
+
+# Building index
+refFasta <- list.files(path="Data",pattern="chr2.fa$", full=T)
+tmp <- bowtie_build(references=refFasta, outdir="Data", prefix="mm9index_chr2", force=TRUE)
+
+# Aligning sequences
+bowtie(sequences="Data/ENCFF001LGM_chr2.fastq",
+       index=file.path("Data", "mm9index_chr2"), 
+       outfile="Data/CTCF_mm9_MF_chr2.sam",
+       sam=TRUE, 
+       best=TRUE, 
+       force=TRUE,
+       threads=4,
+       trim5=2,
+       type="single",
+       m=3
+       )
+
+
+# converting SAM to BAM, sorting and indexing
+insam <- "Data/CTCF_mm9_MF_chr2.sam"
+outbam <- "Data/CTCF_mm9_MF_chr2"
+asBam(insam, outbam, overwrite=T)
+
+
+```
+
+
+<br><br>
+
+3. Align "ENCFF905YGD_chr2.fastq" (RNA-Seq of Liver Mus musculus)  `SpliceMap()`
+    + Set maximum mismatches allowed in the entire read to 4
+    + Use 4 CPU threads to align
+    + Report all alignments for each read
+    + Covert the SAM to BAM, sort and Index
+    + Visualise the BAM using IGV and insepct reads aligned over exons
+    
+
+```{r, echo=TRUE, eval=FALSE, message=FALSE, collapse=TRUE, cache=TRUE}
+readsFiles <- "Data/ENCFF905YGD_chr2.fastq"
+refDir <- "Data/chr2.fa"
+indexDir <- file.path(tempdir(), "refsIndex")
+samFiles <- "Data/ENCFF905YGD_chr2.sam"
+cfg <- list(genome_dir=refDir,
+            reads_list1=readsFiles,
+            read_format="FASTQ",
+            quality_format="phred-33",
+            outfile=samFiles,
+            temp_path=tempdir(),
+            max_intron=400000,
+            max_multi_hit=10,
+            seed_mismatch=1,
+            read_mismatch=4,
+            num_chromosome_together=2,
+            bowtie_base_dir="Data/mm9index_chr2",
+            num_threads=4,
+            try_hard="yes",
+            selectSingleHit=FALSE)
+res <- SpliceMap(cfg)
+
+asBam("Data/ENCFF905YGD_chr2.sam","Data/ENCFF905YGD_chr2",overwrite=T)
+
+```
+
+
+4. Examine the SAM header for the BAM generated in Q3 and find whether the BAM is sorted by coordinates or by readnames
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+library(Rsamtools)
+headerinfo <- scanBamHeader("Data/ENCFF905YGD_chr2.bam")
+headerinfo
+```
