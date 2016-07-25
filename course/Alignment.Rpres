@@ -30,8 +30,8 @@ Overview
 * [Aligning Sequences](#/align2)
 * [Sorting and indexing](#/Sorting)
 * [Summary & Post-Alignment QC](#/QC)
-* [Reading BAM](#/readbam)
-* [Visualisation](#/SeqQC)
+* [Reading BAM/SAM](#/readbam)
+* [Visualisation](#/vis)
 
 
 
@@ -52,17 +52,26 @@ Introduction to Seqeuncing Technology
 
 Revisiting File Formats
 ========================================================
+type: section
 id: FileFormat
+
+
+Revisiting File Formats
+========================================================
 
 ## Genomic File Format Course
 <br><br><br>
-## http://mrccsc.github.io/genomic_formats/genomicFileFormats.html)
+## http://mrccsc.github.io/genomic_formats/genomicFileFormats.html
 
 
 Quality Assessment of Sequencing
 ========================================================
+type: section
 id: SeqQC
 
+
+Quality Assessment of Sequencing
+========================================================
 - Summary
 - Quality score distribtion (5' to 3')
 - Adapter contamination
@@ -160,8 +169,12 @@ Time for Exercises!
 
 Sequence Alignment
 ========================================================
+type: section
 id: align
 
+
+Sequence Alignment
+========================================================
 
 ![Alignment](./images/alignment1.jpg)
 
@@ -194,7 +207,6 @@ Sequence Alignment
 Spaced Seed & Extend
 ========================================================
 
-#{.right}
 ![seed](./images/spacedseed.jpeg)
 
 - Reference genome cut in to small "seeds"
@@ -206,7 +218,6 @@ Spaced Seed & Extend
 Burrows-Wheeler transform (BWT)
 ========================================================
 
-#{.right}
 ![bwt](./images/bwt.jpeg)
 
 - BWT helps to index entire human genome in less than 2 gb memory
@@ -264,7 +275,7 @@ Aligning sequences with Rbowtie
 
 #### Help for building index: bowtie_build_usage()
 
-```{r, echo=TRUE, eval=TRUE, message=FALSE}
+```{r, echo=TRUE, eval=TRUE, message=FALSE, tidy=T}
 library(Rbowtie)
 bowtie_build_usage()
 ```
@@ -306,11 +317,11 @@ bowtie(sequences="Data/ENCFF001LGM_chr1.fastq",
 ```
 
 ```{r, echo=TRUE, eval=FALSE, message=FALSE}
-# reads processed: 2184953
-# reads with at least one reported alignment: 2164338 (99.06%)
-# reads that failed to align: 18292 (0.84%)
-# reads with alignments suppressed due to -m: 2323 (0.11%)
-# Reported 2164338 alignments to 1 output stream(s)
+# reads processed: 975396
+# reads with at least one reported alignment: 967421 (99.18%)
+# reads that failed to align: 7297 (0.75%)
+# reads with alignments suppressed due to -m: 678 (0.07%)
+Reported 967421 alignments to 1 output stream(s)
 ```
 
 
@@ -391,7 +402,7 @@ Sorting & Indexing the SAM/BAM
 library(Rsamtools)
 insam <- "Data/CTCF_mm9_MF.sam"
 outbam <- "Data/CTCF_mm9_MF"
-asBam(insam, outbam)
+asBam(insam, outbam, overwrite=T)
 ```
 
 - Sorting and Indexing a BAM
@@ -429,6 +440,15 @@ samtools index sorted.bam
 ```
 
 
+Time for Exercises!
+========================================================
+* [Exercises Part2](./AlignmentExercise2.html)
+<br><br>
+
+* [Exercises Part2 Solutions](./AlignmentExercise2_Solutions.html)
+
+
+
 Summary & Post-Alignment QC
 ========================================================
 type: section
@@ -450,10 +470,27 @@ param1 <- ScanBamParam(flag=scanBamFlag(isUnmappedQuery=FALSE, isDuplicate=FALSE
 countBam("Data/CTCF_mm9_MF.bam",param=param1)
 ```
 
-<br>
+
+Summary & Post-Alignment QC
+========================================================
+
 ### Using samtools
 ```{r, echo=TRUE, eval=FALSE, message=FALSE}
 samtools flagstat in.bam
+```
+
+```{r, echo=TRUE, eval=FALSE, message=FALSE}
+975396 + 0 in total (QC-passed reads + QC-failed reads)
+0 + 0 duplicates
+967421 + 0 mapped (99.18%:nan%)
+0 + 0 paired in sequencing
+0 + 0 read1
+0 + 0 read2
+0 + 0 properly paired (nan%:nan%)
+0 + 0 with itself and mate mapped
+0 + 0 singletons (nan%:nan%)
+0 + 0 with mate mapped to a different chr
+0 + 0 with mate mapped to a different chr (mapQ>=5)
 ```
 
 
@@ -468,6 +505,7 @@ ChIP-Seq QC
 - Percentage of reads wthin peaks
 - Percentage of reads wthin Blacklist regions
 
+<br><br><br>
 ## R package: ChIPQC (https://bioconductor.org/packages/release/bioc/html/ChIPQC.html)
 
 
@@ -576,13 +614,12 @@ Overlap Counting - countOvrelaps()
 ### Counting number of reads overlapping with promoters 
 
 ```{r, echo=TRUE, eval=TRUE,  message=FALSE, cache=T}
-library("biomaRt")
-ensembl <- useMart("ENSEMBL_MART_ENSEMBL", host = "may2012.archive.ensembl.org") # select ensembl
-ens_mouse <- useDataset("mmusculus_gene_ensembl",mart=ensembl) # select human dataset
-mm9Genes <- getBM(attributes = c("chromosome_name","start_position","end_position","ensembl_gene_id","strand","external_gene_id"), filter="chromosome_name",values=c("1","2"), mart=ens_mouse)
-# add 'chr' prefix to chromosome name
-mm9Genes$chromosome_name <- paste("chr",mm9Genes$chromosome_name,sep="")
-head(mm9Genes)
+library(GenomicFeatures)
+mm9txdb <- makeTxDbFromBiomart(biomart="ENSEMBL_MART_ENSEMBL",dataset="mmusculus_gene_ensembl", host = "may2012.archive.ensembl.org")
+mm9Genes <- genes(mm9txdb)
+seqlevelsStyle(mm9Genes) <- "UCSC"  # Add 'chr' to seqnames
+mm9Genes_subset <- mm9Genes[seqnames(mm9Genes) == "chr1"] # Genes in chromsome 1
+
 ```
 
 
@@ -590,12 +627,7 @@ Overlap Counting - countOvrelaps()
 ========================================================
 
 ```{r, echo=TRUE, eval=TRUE,  message=FALSE, cache=T}
-mm9Genes.GR <- GRanges(seqnames=mm9Genes$chr,
-                       ranges=IRanges(start=mm9Genes$start_position,end=mm9Genes$start_position),
-                       strand=ifelse(mm9Genes$strand==1,"+","-"),
-                       EnsemblID=mm9Genes$ensembl_gene_id,
-                       Symbol=mm9Genes$external_gene_id)
-mm9Promoters <- promoters(mm9Genes.GR,upstream=1000,downstream=1000)
+mm9Promoters <- promoters(mm9Genes_subset,upstream=1000,downstream=1000)
 
 # Reads overlapping with promoters
 CTCFCounts <- countOverlaps(mm9Promoters, SampleAlign)
@@ -614,6 +646,7 @@ Overlap Counting - summarizeOverlaps()
 - Features can be genes, exons, transcripts or any region of interest
 - Features can be GRanges or GRangesList
 - Accepts `ScanBamParam` object to subset the input BAMs
+- Option to control memory consumption (`yieldSize`) and parallel processing `BiocParallel::register`
 
 ### Counting modes
 - Union: Count if read hits any part of one feature, else discard
@@ -625,17 +658,60 @@ Overlap Counting - summarizeOverlaps()
 ========================================================
 
 ### Counting Reads on transcripts for RNA-Seq 
-```{r, echo=TRUE, eval=FALSE, message=FALSE}
-library("TxDb.Mmusculus.UCSC.mm9.knownGene")
-txdb <- TxDb.Mmusculus.UCSC.mm9.knownGene
-transcriptsGR <- genes(txdb)
-transcriptsGR <- transcriptsGR[seqnames(transcriptsGR) == "chr1"]
+```{r, echo=TRUE, eval=FALSE, message=FALSE, cache =T}
+transcriptsGR <- transcripts(txdb)
+transcriptsGR <- transcriptsGR[seqnames(transcriptsGR) == "chr1"] # transcripts in chr1
 
-
-BamFiles <-  BamFileList("Data/ENCFF001QSC_chr1.bam", yieldSize = 100000)
-TranscriptHits <- summarizeOverlaps(transcriptsGR, BamFiles, mode="Union", ignore.strand = T)
+BamFilesIn <-  BamFileList("Data/ENCFF001QSC_chr1.bam", yieldSize = 100000)
+TranscriptHits <- summarizeOverlaps(transcriptsGR, BamFilesIn, mode="Union", ignore.strand = T)
 
 ```
 
 
+Overlap Counting - summarizeOverlaps()
+========================================================
+
+- `summarizeOverlaps` results returned as `SummarizedExperiment` object
+- Counts are accessed with `assays()`
+
+```{r, echo=TRUE, eval=FALSE, message=FALSE, cache =T}
+dim(assays(TranscriptHits)$counts)
+head(assays(TranscriptHits)$counts)
+
+```
+
+
+
+Visualisation - Genomewide coverage
+========================================================
+type: section
+id: vis
+
+
+Visualisation - Genomewide coverage
+========================================================
+
+
+`coverage()` calculates how many ranges overlap with individual positions in the genome. <b>coverage</b> function returns the coverage as Rle instance.
+```{r, echo=TRUE, eval=TRUE,  message=FALSE}
+library(rtracklayer)
+cov <- coverage(SampleAlign)
+export.bw(cov[1], "SampleCov.bw") # exporting chr1
+```
+
+Coverage can be exported as BigWig, Bedgraph, Wiggle and other formats to visualise in genome browsers.
+
+
+Session Info
+========================================================
+```{r, echo=TRUE, eval=TRUE,  message=FALSE}
+sessionInfo()
+```
+
+Time for Exercises!
+========================================================
+* [Exercises Part3](./AlignmentExercise3.html)
+<br><br>
+
+* [Exercises Part3 Solutions](./AlignmentExercise3_Solutions.html)
 
