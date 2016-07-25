@@ -263,7 +263,7 @@ Aligning sequences with Rbowtie
 
 ## Downloading data
 
-https://fileexchange.imperial.ac.uk/pickup.php?claimID=VVn5hRvcus9pT9qA&claimPasscode=feX5sYh9GRUWT9Hd&emailAddr=gdharmal%40imperial.ac.uk
+https://fileexchange.imperial.ac.uk/pickup.php?claimID=EBh3VQ3xQKZCcCqY&claimPasscode=g8iANNiTrwdDJiod&emailAddr=gdharmal%40imperial.ac.uk
 
 - Download the zip and unzip under "course" directory (this will create a new directory "Data")
 
@@ -275,7 +275,7 @@ Aligning sequences with Rbowtie
 
 #### Help for building index: bowtie_build_usage()
 
-```{r, echo=TRUE, eval=TRUE, message=FALSE, tidy=T}
+```{r, echo=TRUE, eval=TRUE, message=FALSE, tidy=T, collapse=TRUE}
 library(Rbowtie)
 bowtie_build_usage()
 ```
@@ -286,8 +286,8 @@ Aligning sequences with Rbowtie
 ### Building Index
 
 ```{r, echo=TRUE, eval=FALSE, message=FALSE}
-refFasta <- list.files(path="Data",pattern="*.fa$", full=T)
-tmp <- bowtie_build(references=refFasta, outdir="Data", prefix="mm9index_chr1_chr2", force=TRUE)
+refFasta <- list.files(path="Data",pattern="chr1.fa$", full=T)
+tmp <- bowtie_build(references=refFasta, outdir="Data", prefix="mm9index_chr1", force=TRUE)
 ```
 
 Aligning sequences with Rbowtie
@@ -295,7 +295,7 @@ Aligning sequences with Rbowtie
 
 #### Help for aligning sequences: bowtie_usage()
 
-```{r, echo=TRUE, eval=TRUE, message=FALSE, strip.white=T}
+```{r, echo=TRUE, eval=TRUE, message=FALSE, strip.white=T, collapse=TRUE}
 bowtie_usage()
 ```
 
@@ -306,7 +306,7 @@ Aligning sequences with Rbowtie
 ```{r, echo=TRUE, eval=FALSE, message=FALSE}
 
 bowtie(sequences="Data/ENCFF001LGM_chr1.fastq",
-       index=file.path("Data", "mm9index_chr1_chr2"), 
+       index=file.path("Data", "mm9index_chr1"), 
        outfile="Data/CTCF_mm9_MF.sam", 
        sam=TRUE, 
        best=TRUE, 
@@ -318,10 +318,10 @@ bowtie(sequences="Data/ENCFF001LGM_chr1.fastq",
 
 ```{r, echo=TRUE, eval=FALSE, message=FALSE}
 # reads processed: 975396
-# reads with at least one reported alignment: 967421 (99.18%)
-# reads that failed to align: 7297 (0.75%)
-# reads with alignments suppressed due to -m: 678 (0.07%)
-Reported 967421 alignments to 1 output stream(s)
+# reads with at least one reported alignment: 967484 (99.19%)
+# reads that failed to align: 7340 (0.75%)
+# reads with alignments suppressed due to -m: 572 (0.06%)
+# Reported 967484 alignments to 1 output stream(s)
 ```
 
 
@@ -362,13 +362,12 @@ cfg <- list(genome_dir=refDir,
             seed_mismatch=1,
             read_mismatch=2,
             num_chromosome_together=2,
-            bowtie_base_dir="Data/mm9index_chr1_chr2",
-            num_threads=4,
+            bowtie_base_dir="Data/mm9index_chr1",
+            num_threads=2,
             try_hard="yes",
             selectSingleHit=TRUE)
 res <- SpliceMap(cfg)
 ```
-
 
 
 
@@ -585,7 +584,7 @@ Reading Sequence alignments (BAM/SAM)
 
 We can also customise which regions to read
 
-```{r, echo=TRUE, eval=TRUE,  message=FALSE, cache=T}
+```{r, echo=TRUE, eval=TRUE,  message=FALSE, cache=T, collapse=TRUE}
 region <- GRanges("chr1",IRanges(3000000,5000000))
 param1 <- ScanBamParam(what=c("rname", "pos", "cigar","qwidth"),which=region, flag=scanBamFlag(isUnmappedQuery=FALSE, isDuplicate=FALSE, isNotPassingQualityControls=FALSE))
 SampleAlign1 <- readGAlignments(bamin,param=param1)
@@ -613,7 +612,7 @@ Overlap Counting - countOvrelaps()
 
 ### Counting number of reads overlapping with promoters 
 
-```{r, echo=TRUE, eval=TRUE,  message=FALSE, cache=T}
+```{r, echo=TRUE, eval=TRUE,  message=FALSE, cache=T, collapse=TRUE}
 library(GenomicFeatures)
 mm9txdb <- makeTxDbFromBiomart(biomart="ENSEMBL_MART_ENSEMBL",dataset="mmusculus_gene_ensembl", host = "may2012.archive.ensembl.org")
 mm9Genes <- genes(mm9txdb)
@@ -658,7 +657,7 @@ Overlap Counting - summarizeOverlaps()
 ========================================================
 
 ### Counting Reads on transcripts for RNA-Seq 
-```{r, echo=TRUE, eval=FALSE, message=FALSE, cache =T}
+```{r, echo=TRUE, eval=FALSE, message=FALSE, cache =T, collapse=TRUE}
 transcriptsGR <- transcripts(txdb)
 transcriptsGR <- transcriptsGR[seqnames(transcriptsGR) == "chr1"] # transcripts in chr1
 

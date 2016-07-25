@@ -292,7 +292,7 @@ Aligning sequences with Rbowtie
 
 ## Downloading data
 
-https://fileexchange.imperial.ac.uk/pickup.php?claimID=VVn5hRvcus9pT9qA&claimPasscode=feX5sYh9GRUWT9Hd&emailAddr=gdharmal%40imperial.ac.uk
+https://fileexchange.imperial.ac.uk/pickup.php?claimID=EBh3VQ3xQKZCcCqY&claimPasscode=g8iANNiTrwdDJiod&emailAddr=gdharmal%40imperial.ac.uk
 
 - Download the zip and unzip under "course" directory (this will create a new directory "Data")
 
@@ -308,9 +308,6 @@ Aligning sequences with Rbowtie
 ```r
 library(Rbowtie)
 bowtie_build_usage()
-```
-
-```
  [1] "Usage: bowtie2-build-s [options]* <reference_in> <ebwt_outfile_base>"            
  [2] "    reference_in            comma-separated list of files with ref sequences"    
  [3] "    ebwt_outfile_base       write Ebwt data to files with this dir/basename"     
@@ -343,8 +340,8 @@ Aligning sequences with Rbowtie
 
 
 ```r
-refFasta <- list.files(path="Data",pattern="*.fa$", full=T)
-tmp <- bowtie_build(references=refFasta, outdir="Data", prefix="mm9index_chr1_chr2", force=TRUE)
+refFasta <- list.files(path="Data",pattern="chr1.fa$", full=T)
+tmp <- bowtie_build(references=refFasta, outdir="Data", prefix="mm9index_chr1", force=TRUE)
 ```
 
 Aligning sequences with Rbowtie
@@ -355,9 +352,6 @@ Aligning sequences with Rbowtie
 
 ```r
 bowtie_usage()
-```
-
-```
  [1] "Usage: "                                                                          
  [2] "bowtie-build-s [options]* <ebwt> {-1 <m1> -2 <m2> | --12 <r> | <s>} [<hit>]"      
  [3] ""                                                                                 
@@ -452,7 +446,7 @@ Aligning sequences with Rbowtie
 
 ```r
 bowtie(sequences="Data/ENCFF001LGM_chr1.fastq",
-       index=file.path("Data", "mm9index_chr1_chr2"), 
+       index=file.path("Data", "mm9index_chr1"), 
        outfile="Data/CTCF_mm9_MF.sam", 
        sam=TRUE, 
        best=TRUE, 
@@ -464,10 +458,10 @@ bowtie(sequences="Data/ENCFF001LGM_chr1.fastq",
 
 ```r
 # reads processed: 975396
-# reads with at least one reported alignment: 967421 (99.18%)
-# reads that failed to align: 7297 (0.75%)
-# reads with alignments suppressed due to -m: 678 (0.07%)
-Reported 967421 alignments to 1 output stream(s)
+# reads with at least one reported alignment: 967484 (99.19%)
+# reads that failed to align: 7340 (0.75%)
+# reads with alignments suppressed due to -m: 572 (0.06%)
+# Reported 967484 alignments to 1 output stream(s)
 ```
 
 
@@ -509,13 +503,12 @@ cfg <- list(genome_dir=refDir,
             seed_mismatch=1,
             read_mismatch=2,
             num_chromosome_together=2,
-            bowtie_base_dir="Data/mm9index_chr1_chr2",
-            num_threads=4,
+            bowtie_base_dir="Data/mm9index_chr1",
+            num_threads=2,
             try_hard="yes",
             selectSingleHit=TRUE)
 res <- SpliceMap(cfg)
 ```
-
 
 
 
@@ -571,379 +564,36 @@ Few key functions in Rsamtools
 
 <br><br>
 
-```r
-headerinfo <- scanBamHeader("Data/CTCF_mm9_MF.bam")
 
-chrsinbam <- lapply(scanBamHeader("Data/CTCF_mm9_MF.bam"),function(h) {names(h$targets)})
-chrsinbam <- as.vector(unlist(chrsinbam))
-chrsinbam
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```
+Error in value[[3L]](cond) : 
+  failed to open BamFile: file(s) do not exist:
+  'Data/CTCF_mm9_MF.bam'
 ```
-
-```
-[1] "chr1" "chr2"
-```
-
-
-Sorting & Indexing using samtools
-========================================================
-
-
-```r
-samtools view -b in.sam > out.bam
-samtools sort in.bam outputprefix
-samtools index sorted.bam
-```
-
-
-Time for Exercises!
-========================================================
-* [Exercises Part2](./AlignmentExercise2.html)
-<br><br>
-
-* [Exercises Part2 Solutions](./AlignmentExercise2_Solutions.html)
-
-
-
-Summary & Post-Alignment QC
-========================================================
-type: section
-id: QC
-
-
-Summary & Post-Alignment QC
-========================================================
-<br>
-### Alignment Summary
-- Alignment rate
-- Primary and secondary alignments
-- Percentage of Duplicate reads
-- rRNA/mtDNA reads
-- Paired reads: properly paired, unpaired, chimeric pair
-
-
-```r
-param1 <- ScanBamParam(flag=scanBamFlag(isUnmappedQuery=FALSE, isDuplicate=FALSE))
-countBam("Data/CTCF_mm9_MF.bam",param=param1)
-```
-
-```
-  space start end width            file records nucleotides
-1    NA    NA  NA    NA CTCF_mm9_MF.bam  967421    34827156
-```
-
-
-Summary & Post-Alignment QC
-========================================================
-
-### Using samtools
-
-```r
-samtools flagstat in.bam
-```
-
-
-```r
-975396 + 0 in total (QC-passed reads + QC-failed reads)
-0 + 0 duplicates
-967421 + 0 mapped (99.18%:nan%)
-0 + 0 paired in sequencing
-0 + 0 read1
-0 + 0 read2
-0 + 0 properly paired (nan%:nan%)
-0 + 0 with itself and mate mapped
-0 + 0 singletons (nan%:nan%)
-0 + 0 with mate mapped to a different chr
-0 + 0 with mate mapped to a different chr (mapQ>=5)
-```
-
-
-ChIP-Seq QC
-========================================================
-
-- Reads summary
-- Duplicate percentage
-- Estimation of Fragment Length
-- Cross-Coverage score at the fragment length
-- Cross-coverage score at the fragment length over Cross-coverage at the read length
-- Percentage of reads wthin peaks
-- Percentage of reads wthin Blacklist regions
-
-<br><br><br>
-## R package: ChIPQC (https://bioconductor.org/packages/release/bioc/html/ChIPQC.html)
-
-
-RNA-Seq QC
-========================================================
-
-- Reads Summary
-- Uniformity of 5' to 3' gene coverage bias
-- Percentage of reads on exons
-- Strand specificity
-- Correlation between replicates
-
-### Tools: 
-- RSeQC http://rseqc.sourceforge.net/
-- Picard (CollectRnaSeqMetrics)
-- RNA-SeQC 
-
-
-Reading BAM/SAM
-========================================================
-type: section
-id: readbam
-
-
-Reading BAM/SAM
-========================================================
-
-### Methods for reading BAM/SAM
-
-- <b>readAligned</b> from ShortRead package 
-    – Accept multiple formats – BAM, export
-    - Reads all files in a directory
-    - Reads base call qualities, chromosome, position, and strand
-- <b>scanBam</b> from Rsamtools package
-    - scanBam reads BAM files into list structure
-    - Options to select what fields and which records to import using <b>ScanBamParam</b>
-- <b>readGAlignments</b> and <b>readGAlignmentPairs</b> from GenomicAlignments package
-    - can accept <b>ScanBamParam</b> object
-
-
-
-Reading BAM/SAM
-========================================================
-
-<b>ScanBamParam:</b>
-
-
-```r
-# Constructor
-ScanBamParam(flag = scanBamFlag(), what = character(0), which)
-
-# Constructor helpers
-scanBamFlag(isPaired = NA, isProperPair = NA, isUnmappedQuery = NA, 
-    hasUnmappedMate = NA, isMinusStrand = NA, isMateMinusStrand = NA,
-    isFirstMateRead = NA, isSecondMateRead = NA, isNotPrimaryRead = NA,
-    isNotPassingQualityControls = NA, isDuplicate = NA)
-```
-
-Reading BAM/SAM
-========================================================
-
-- GenomicRanges package defines the GAlignments class – a specialised class for storing set of genomic alignments (ex: sequencing data) 
-- Only BAM support now – future version may include other formats
-- The readGAlignments function takes an additional argument, <b>param</b> allowing the user to customise which genomic regions and which fields to read from BAM
--<b>param</b> can be constructed using </b>ScanBamParam</b> function
-
-
-```r
-library(GenomicAlignments)
-bamin <- "Data/CTCF_mm9_MF.bam"
-SampleAlign <- readGAlignments(bamin)
-SampleAlign
-```
-
-```
-GAlignments object with 967421 alignments and 0 metadata columns:
-           seqnames strand       cigar    qwidth     start       end
-              <Rle>  <Rle> <character> <integer> <integer> <integer>
-       [1]     chr1      -         36M        36   3000895   3000930
-       [2]     chr1      -         36M        36   3000895   3000930
-       [3]     chr1      +         36M        36   3000941   3000976
-       [4]     chr1      +         36M        36   3000998   3001033
-       [5]     chr1      +         36M        36   3001030   3001065
-       ...      ...    ...         ...       ...       ...       ...
-  [967417]     chr2      +         36M        36  98507127  98507162
-  [967418]     chr2      -         36M        36  98507272  98507307
-  [967419]     chr2      -         36M        36  98507272  98507307
-  [967420]     chr2      -         36M        36 139690130 139690165
-  [967421]     chr2      +         36M        36 179414086 179414121
-               width     njunc
-           <integer> <integer>
-       [1]        36         0
-       [2]        36         0
-       [3]        36         0
-       [4]        36         0
-       [5]        36         0
-       ...       ...       ...
-  [967417]        36         0
-  [967418]        36         0
-  [967419]        36         0
-  [967420]        36         0
-  [967421]        36         0
-  -------
-  seqinfo: 2 sequences from an unspecified genome
-```
-
-
-
-Reading Sequence alignments (BAM/SAM)
-========================================================
-
-We can also customise which regions to read
-
-
-```r
-region <- GRanges("chr1",IRanges(3000000,5000000))
-param1 <- ScanBamParam(what=c("rname", "pos", "cigar","qwidth"),which=region, flag=scanBamFlag(isUnmappedQuery=FALSE, isDuplicate=FALSE, isNotPassingQualityControls=FALSE))
-SampleAlign1 <- readGAlignments(bamin,param=param1)
-```
-
-
-Overlap Counting
-========================================================
-
-- Counting number of reads overlap with exons (RNA-Seq)
-- Counting number of reads overalpping with promoters or peaks in ChIP-Seq
-
-<br><br>
-
-- <b>countOverlaps()</b> from `GenomicRanges` package
-- <b>summarizeOverlaps()</b> from `GenomicAlignments` package
-
-
-Overlap Counting - countOvrelaps()
-========================================================
-
-- <b>countOverlaps()</b> tabulates number of subject intervals overlap with each interval in query, ex: counting number of sequencing reads overlap with genes in RNA-Seq
-
-- countOverlaps(FeatureGR, AlignmentsGR)
-
-### Counting number of reads overlapping with promoters 
-
-
-```r
-library(GenomicFeatures)
-mm9txdb <- makeTxDbFromBiomart(biomart="ENSEMBL_MART_ENSEMBL",dataset="mmusculus_gene_ensembl", host = "may2012.archive.ensembl.org")
-mm9Genes <- genes(mm9txdb)
-seqlevelsStyle(mm9Genes) <- "UCSC"  # Add 'chr' to seqnames
-mm9Genes_subset <- mm9Genes[seqnames(mm9Genes) == "chr1"] # Genes in chromsome 1
-```
-
-
-Overlap Counting - countOvrelaps()
-========================================================
-
-
-```r
-mm9Promoters <- promoters(mm9Genes_subset,upstream=1000,downstream=1000)
-
-# Reads overlapping with promoters
-CTCFCounts <- countOverlaps(mm9Promoters, SampleAlign)
-
-# Add CTCF counts as elementMetadata to hg19Promoters object
-mcols(mm9Promoters)$CTCF <- CTCFCounts
-```
-
-
-
-Overlap Counting - summarizeOverlaps()
-========================================================
-
-- Extends `countOverlaps()` by providing options to handle multiple BAMs and to handle reads overlap with multiple features
-- Features can be genes, exons, transcripts or any region of interest
-- Features can be GRanges or GRangesList
-- Accepts `ScanBamParam` object to subset the input BAMs
-- Option to control memory consumption (`yieldSize`) and parallel processing `BiocParallel::register`
-
-### Counting modes
-- Union: Count if read hits any part of one feature, else discard
-- IntersectionStrict: Count if reads falls completely within in one feature, else discard
-- IntersectionNotEmpty: Count if read falls in a unique disjoint region of a feature, else drop
-
-
-Overlap Counting - summarizeOverlaps()
-========================================================
-
-### Counting Reads on transcripts for RNA-Seq 
-
-```r
-transcriptsGR <- transcripts(txdb)
-transcriptsGR <- transcriptsGR[seqnames(transcriptsGR) == "chr1"] # transcripts in chr1
-
-BamFilesIn <-  BamFileList("Data/ENCFF001QSC_chr1.bam", yieldSize = 100000)
-TranscriptHits <- summarizeOverlaps(transcriptsGR, BamFilesIn, mode="Union", ignore.strand = T)
-```
-
-
-Overlap Counting - summarizeOverlaps()
-========================================================
-
-- `summarizeOverlaps` results returned as `SummarizedExperiment` object
-- Counts are accessed with `assays()`
-
-
-```r
-dim(assays(TranscriptHits)$counts)
-head(assays(TranscriptHits)$counts)
-```
-
-
-
-Visualisation - Genomewide coverage
-========================================================
-type: section
-id: vis
-
-
-Visualisation - Genomewide coverage
-========================================================
-
-
-`coverage()` calculates how many ranges overlap with individual positions in the genome. <b>coverage</b> function returns the coverage as Rle instance.
-
-```r
-library(rtracklayer)
-cov <- coverage(SampleAlign)
-export.bw(cov[1], "SampleCov.bw") # exporting chr1
-```
-
-Coverage can be exported as BigWig, Bedgraph, Wiggle and other formats to visualise in genome browsers.
-
-
-Session Info
-========================================================
-
-```r
-sessionInfo()
-```
-
-```
-R version 3.2.3 (2015-12-10)
-Platform: x86_64-apple-darwin13.4.0 (64-bit)
-Running under: OS X 10.11.2 (El Capitan)
-
-locale:
-[1] en_GB.UTF-8/en_GB.UTF-8/en_GB.UTF-8/C/en_GB.UTF-8/en_GB.UTF-8
-
-attached base packages:
-[1] stats4    parallel  stats     graphics  grDevices utils     datasets 
-[8] methods   base     
-
-other attached packages:
- [1] rtracklayer_1.30.4         Rbowtie_1.10.0            
- [3] ShortRead_1.28.0           GenomicAlignments_1.6.3   
- [5] SummarizedExperiment_1.0.2 Biobase_2.30.0            
- [7] Rsamtools_1.22.0           GenomicRanges_1.22.4      
- [9] GenomeInfoDb_1.6.3         Biostrings_2.38.3         
-[11] XVector_0.10.0             IRanges_2.4.8             
-[13] S4Vectors_0.8.11           BiocParallel_1.4.3        
-[15] BiocGenerics_0.16.1        knitr_1.12                
-
-loaded via a namespace (and not attached):
- [1] magrittr_1.5         zlibbioc_1.16.0      lattice_0.20-33     
- [4] stringr_1.0.0        hwriter_1.3.2        tools_3.2.3         
- [7] grid_3.2.3           latticeExtra_0.6-28  lambda.r_1.1.9      
-[10] futile.logger_1.4.1  digest_0.6.9         RColorBrewer_1.1-2  
-[13] formatR_1.4          futile.options_1.0.0 bitops_1.0-6        
-[16] RCurl_1.95-4.8       evaluate_0.8         stringi_1.1.1       
-[19] XML_3.98-1.4        
-```
-
-Time for Exercises!
-========================================================
-* [Exercises Part3](./AlignmentExercise3.html)
-<br><br>
-
-* [Exercises Part3 Solutions](./AlignmentExercise3_Solutions.html)
-
