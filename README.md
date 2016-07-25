@@ -44,7 +44,7 @@ To install these,
 * Install the packages in the R console
 <pre>
 source("https://bioconductor.org/biocLite.R")
-biocLite(c("Rbowtie","ShortRead","GenomicAlignments","Rsamtools","QuasR"))
+biocLite(c("Rbowtie","ShortRead","GenomicAlignments","Rsamtools","QuasR", "GenomicFeatures", "rtracklayer"))
 </pre>
 
 #### Download the material
