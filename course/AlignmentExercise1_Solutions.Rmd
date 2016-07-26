@@ -1,0 +1,54 @@
+---
+title: "Alignment Exercises 1 Solutions"
+author: "MRC CSC Bioinformatics Core Team"
+date: "27 July 2016"
+output: html_document
+---
+
+----
+```{r echo=FALSE, eval=TRUE, warning=FALSE}
+
+```
+
+
+# Solutions
+
+1. Read "ENCFF001LGM_chr2.fastq" fastq file using `ShortRead` package
+    + What is the read length of the sequencing reads?
+    + How many sequencing reads are in this fastq?
+    + Plot the distribution of quality scores using `boxplot()` function (convert ASCII encoded values into matrix using `as(QualityValues, "matrix")` )
+    + Plot the distribution of A/T/C/G nucleotides by cycle using `matplot` function (see `alphabetByCycle` help)
+    + Generate Quality assessment report in HTML
+    
+    
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+library(ShortRead)
+FastqIn <- "Data/ENCFF001LGM_chr2.fastq"
+fq <- readFastq(FastqIn)
+
+# Read length and Number of sequences
+fq
+
+# Distribution of quality scores
+QualScores <- as(quality(fq), "matrix")
+boxplot(QualScores)
+
+# Dsitribution of Nuecleotides
+temp <- alphabetByCycle(sread(fq))
+NucByCycle <- t(temp[1:4,]) # count table for A/T/G/C
+
+# Distibution of nucleotides by cycle
+matplot(NucByCycle, type="l", col = 1:4, main="Nucleotide Frequency by cycle", xlab="Cycle", ylab="Frequency")
+legend("topright",legend=colnames(NucByCycle),col=1:4, fill=1:4)
+
+
+# Report
+qaSummary <- qa(FastqIn, type="fastq")
+browseURL(report(qaSummary))
+
+
+```
+
+2. Download and install FastQC from http://www.bioinformatics.babraham.ac.uk/projects/fastqc/
+    + Import `ENCFF001QSC_chr1.fastq` in FastQC and generate HTML report
+

@@ -1,0 +1,33 @@
+---
+title: "Alignment Exercises 3"
+author: "MRC CSC Bioinformatics Core Team"
+date: "27 July 2016"
+output: html_document
+---
+
+----
+```{r echo=FALSE, eval=TRUE, warning=FALSE}
+
+```
+
+
+# Exercises
+<br><br>
+
+#### Note: Files are in "Data" directory
+
+
+1. Import BAM generated in Exercise2-Q2 using `GenomicAlignments` package
+    + Import reads in `chr2` that are aligned, passed quality control and not duplicates (use `ScanBamParam`)
+2. Create a GRanges object with promoters in chr2  for mm9
+3. Compute number of reads overlap with each promoter in chr2 using `countOverlaps()`
+4. Subset sequencing reads that overlap with promoters created in Q2
+5. Check total reads in Q4 and Q5 are similar. If not, what could be the reason?
+
+
+6. Create GRangesList object with exons for genes in chr2 (mm9)
+7. Using RNA-Seq BAM generated in Exercise2-Q3, count number of reads overlap with genes in chr2 (mm9) using `summarizeOverlaps()` function
+8. Extract the read counts and create a dataframe with gene identifiers and read counts.
+9. Import RNA-Seq BAM generated in Exercise2-Q3 using `GenomicAlignments` package
+      + Subset reads overlap with splice junctions
+      
