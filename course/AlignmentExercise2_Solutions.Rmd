@@ -69,7 +69,6 @@ asBam(insam, outbam, overwrite=T)
 ```{r, echo=TRUE, eval=FALSE, message=FALSE, collapse=TRUE, cache=TRUE}
 readsFiles <- "Data/ENCFF905YGD_chr2.fastq"
 refDir <- "Data/chr2.fa"
-indexDir <- file.path(tempdir(), "refsIndex")
 samFiles <- "Data/ENCFF905YGD_chr2.sam"
 cfg <- list(genome_dir=refDir,
             reads_list1=readsFiles,

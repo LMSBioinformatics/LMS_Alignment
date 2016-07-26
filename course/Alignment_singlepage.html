@@ -120,7 +120,7 @@ $(document).ready(function () {
 
 <div id="sequence-alignment-tutorial" class="section level1">
 <h1>Sequence Alignment Tutorial</h1>
-<p>css: Rpress.css author: “MRC CSC Bioinformatics Core Team” date:<a href="http://mrccsc.github.io/training.html" class="uri">http://mrccsc.github.io/training.html</a> width: 1440 height: 1100 autosize: true font-import: <link href="data:text/css; charset=utf-8,%40font%2Dface%20%7B%0A%20%20font%2Dfamily%3A%20%27Slabo%2027px%27%3B%0A%20%20font%2Dstyle%3A%20normal%3B%0A%20%20font%2Dweight%3A%20400%3B%0A%20%20src%3A%20local%28%27Slabo%2027px%27%29%2C%20local%28%27Slabo27px%2DRegular%27%29%2C%20url%28http%3A%2F%2Ffonts%2Egstatic%2Ecom%2Fs%2Fslabo27px%2Fv3%2FPuwvqkdbcqU%2DfCZ9Ed%2Db7S3USBnSvpkopQaUR%2D2r7iU%2Ettf%29%20format%28%27truetype%27%29%3B%0A%7D%0A" rel="stylesheet" type="text/css"> font-family: ‘Slabo 27px’, serif; css:style.css</p>
+<p>author: “MRC CSC Bioinformatics Core Team” date:<a href="http://mrccsc.github.io/training.html" class="uri">http://mrccsc.github.io/training.html</a> width: 1440 height: 1100 autosize: true css:style.css</p>
 </div>
 <div id="mrc-csc-training-resources" class="section level1">
 <h1>MRC CSC Training Resources</h1>
@@ -571,7 +571,6 @@ tmp &lt;- bowtie_build(references=refFasta, outdir=&quot;Data&quot;, prefix=&quo
 <h3>Aligning the sequences using SpliceMap</h3>
 <pre class="r"><code>readsFiles &lt;- &quot;Data/ENCFF905YGD_chr1.fastq&quot;
 refDir &lt;- &quot;Data/chr1.fa&quot;
-indexDir &lt;- file.path(tempdir(), &quot;refsIndex&quot;)
 samFiles &lt;- &quot;Data/ENCFF905YGD_chr1.sam&quot;
 cfg &lt;- list(genome_dir=refDir,
             reads_list1=readsFiles,

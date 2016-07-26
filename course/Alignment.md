@@ -1,13 +1,10 @@
 Sequence Alignment Tutorial
 ========================================================
-css: Rpress.css
 author: "MRC CSC Bioinformatics Core Team"
 date:http://mrccsc.github.io/training.html
 width: 1440
 height: 1100
 autosize: true
-font-import: <link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
-font-family: 'Slabo 27px', serif;
 css:style.css
 
 
@@ -506,7 +503,6 @@ Spliced Alignment using SpliceMap
 ```r
 readsFiles <- "Data/ENCFF905YGD_chr1.fastq"
 refDir <- "Data/chr1.fa"
-indexDir <- file.path(tempdir(), "refsIndex")
 samFiles <- "Data/ENCFF905YGD_chr1.sam"
 cfg <- list(genome_dir=refDir,
             reads_list1=readsFiles,
