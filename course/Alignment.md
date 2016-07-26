@@ -506,7 +506,6 @@ Spliced Alignment using SpliceMap
 ```r
 readsFiles <- "Data/ENCFF905YGD_chr1.fastq"
 refDir <- "Data/chr1.fa"
-indexDir <- file.path(tempdir(), "refsIndex")
 samFiles <- "Data/ENCFF905YGD_chr1.sam"
 cfg <- list(genome_dir=refDir,
             reads_list1=readsFiles,

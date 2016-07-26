@@ -571,7 +571,6 @@ tmp &lt;- bowtie_build(references=refFasta, outdir=&quot;Data&quot;, prefix=&quo
 <h3>Aligning the sequences using SpliceMap</h3>
 <pre class="r"><code>readsFiles &lt;- &quot;Data/ENCFF905YGD_chr1.fastq&quot;
 refDir &lt;- &quot;Data/chr1.fa&quot;
-indexDir &lt;- file.path(tempdir(), &quot;refsIndex&quot;)
 samFiles &lt;- &quot;Data/ENCFF905YGD_chr1.sam&quot;
 cfg &lt;- list(genome_dir=refDir,
             reads_list1=readsFiles,
