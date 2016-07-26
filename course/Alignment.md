@@ -87,6 +87,7 @@ id: SeqQC
 Quality Assessment of Sequencing
 ========================================================
 
+<br>
 ### Tools for Alignment & QC
 ![Multiplexing](./images/Alignment_flow.jpg)
 
@@ -102,6 +103,7 @@ Quality Assessment of Sequencing
 Quality Assessment of Sequencing
 ========================================================
 
+<br>
 ### R Packages: ShortRead, Rqc, SeqTools
 
 <br>
@@ -126,6 +128,7 @@ fq <- readFastq(fastqfile)
 Quality Assessment of Sequencing
 ========================================================
 
+<br>
 ### Exploring sequences and Quality Scores
 
 ```r
@@ -164,6 +167,7 @@ quality:
 Quality Assessment of Sequencing
 ========================================================
 
+<br>
 ### Quality assessment Report
 
 ```r
@@ -237,6 +241,7 @@ Sequence Alignment
 Sequence Alignment
 ========================================================
 
+<br>
 ### How to
 - Align reads efficiently in terms of memory and time?
 - Account for mismatches and repeat regions 
@@ -298,6 +303,7 @@ id: align2
 Aligning sequences with Rbowtie
 ========================================================
 
+<br>
 ### Required Input
 - Genome fasta
 - Sequencing reads (fastq)
@@ -312,6 +318,7 @@ Aligning sequences with Rbowtie
 Aligning sequences with Rbowtie
 ========================================================
 
+<br>
 ### Building Index for the genome
 
 #### Help for building index: bowtie_build_usage()
@@ -348,6 +355,7 @@ bowtie_build_usage()
 Aligning sequences with Rbowtie
 ========================================================
 
+<br>
 ### Building Index
 
 
@@ -359,6 +367,7 @@ tmp <- bowtie_build(references=refFasta, outdir="Data", prefix="mm9index_chr1", 
 Aligning sequences with Rbowtie
 ========================================================
 
+<br>
 #### Help for aligning sequences: bowtie_usage()
 
 
@@ -497,6 +506,7 @@ Spliced Alignment using SpliceMap
 Spliced Alignment using SpliceMap
 ========================================================
 
+<br>
 ### Aligning the sequences using SpliceMap
 
 
@@ -533,7 +543,7 @@ id: Sorting
 Sorting & Indexing the SAM/BAM
 ========================================================
 
-<br><br>
+<br>
 ### Sorting SAM/BAM
 
 - Most post-processing methods requires reads sorted by aligned position
@@ -546,7 +556,7 @@ Sorting & Indexing the SAM/BAM
 
 Sorting & Indexing the SAM/BAM
 ========================================================
-<br><br>
+<br>
 ### Convert SAM to BAM
 
 - `asBam` converts SAM to BAM, sort and index
@@ -591,7 +601,7 @@ chrsinbam
 
 Sorting & Indexing using samtools
 ========================================================
-
+<br>
 
 ```r
 samtools view -b in.sam > out.bam
@@ -639,7 +649,7 @@ countBam("Data/CTCF_mm9_MF.bam",param=param1)
 
 Summary & Post-Alignment QC
 ========================================================
-
+<br>
 ### Using samtools
 
 ```r
@@ -700,7 +710,7 @@ id: readbam
 
 Reading BAM/SAM
 ========================================================
-
+<br>
 ### Methods for reading BAM/SAM
 
 - <b>readAligned</b> from ShortRead package 
@@ -859,7 +869,7 @@ Overlap Counting - summarizeOverlaps()
 
 Overlap Counting - summarizeOverlaps()
 ========================================================
-
+<br>
 ### Counting Reads on genes for RNA-Seq 
 
 ```r
