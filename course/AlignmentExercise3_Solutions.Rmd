@@ -1,0 +1,109 @@
+---
+title: "Alignment Exercises 3 Solutions"
+author: "MRC CSC Bioinformatics Core Team"
+date: "27 July 2016"
+output: html_document
+---
+
+----
+```{r echo=FALSE, eval=TRUE, warning=FALSE}
+
+```
+
+
+# Solutions
+
+1. Import BAM generated in Exercise2-Q2 using `GenomicAlignments` package
+    + Import reads that are aligned, passed quality control and not duplicates (use `ScanBamParam`)
+
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+
+library(GenomicAlignments)
+library(Rsamtools)
+
+
+# Importing BAM
+bamin <- "Data/ENCFF001LGM_chr1_chr2.bam"
+which <- GRanges(seqnames = "chr2",IRanges(1,181748087)) #chr2 
+param1 <- ScanBamParam(which= which, flag=scanBamFlag(isUnmappedQuery=FALSE, isDuplicate=FALSE, isNotPassingQualityControls=FALSE))
+ENCFF001LGMAln <- readGAlignments(bamin,param=param1)
+```
+
+2. Create a GRanges object with promoters in chr2 for mm9
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+# Promoters in chr1 and chr2
+library(GenomicFeatures)
+mm9txdb <- makeTxDbFromBiomart(biomart="ENSEMBL_MART_ENSEMBL",dataset="mmusculus_gene_ensembl", host = "may2012.archive.ensembl.org")
+mm9Genes <- genes(mm9txdb)
+seqlevelsStyle(mm9Genes) <- "UCSC"  # Add 'chr' to seqnames
+mm9Genes_subset <- mm9Genes[seqnames(mm9Genes)== "chr2"] # Genes in chr2
+mm9Promoters <- promoters(mm9Genes_subset,upstream=1000,downstream=1000)
+```
+
+
+
+3. Compute number of reads overlap with each promoter in chr2 using `countOverlaps()`
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+# Computing number of reads overlap with promoters
+ENCFF001LGMCount <- countOverlaps(mm9Promoters, ENCFF001LGMAln)
+
+# Add counts as elementMetadata to promoters object
+mcols(mm9Promoters)$ENCFF001LGM <- ENCFF001LGMCount
+```
+
+
+4. Subset sequencing reads that overlap with promoters created in Q2
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+ENCFF001LGMAlnSubset <- subsetByOverlaps(ENCFF001LGMAln, mm9Promoters)
+```
+
+
+5. Check total reads in Q4 and Q5 are similar. If not, what could be the reason? 
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+# Number of reads by countOverlaps
+sum(mcols(mm9Promoters)$ENCFF001LGM)
+
+# Number of reads by subsetByOverlaps
+length(ENCFF001LGMAlnSubset)
+
+```
+
+
+<br><br>
+
+
+6. Create GRangesList object with exons for genes in chr2 (mm9)
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+seqlevels(mm9txdb) <- "2" # Filter for genes in chr2
+mm9ExonsByGene <- exonsBy(mm9txdb, "gene")
+seqlevelsStyle(mm9ExonsByGene) <- "UCSC"  # Add 'chr' to seqnames
+
+mm9ExonsByGene
+
+```
+
+7. Using RNA-Seq BAM generated in Exercise2-Q3, count number of reads overlap with genes in chr2 (mm9) using `summarizeOverlaps()` function
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+BamFilesIn <-  BamFileList("Data/ENCFF905YGD_chr2.bam", yieldSize = 100000)
+GenetHits <- summarizeOverlaps(mm9ExonsByGene, BamFilesIn, mode="Union", ignore.strand = T)
+
+```
+
+8. Extract the read counts and create a dataframe with gene identifiers and read counts.
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+Genecounts <- assays(GenetHits)$counts
+Genecounts.df <- data.frame(Gene=names(mm9ExonsByGene), counts = Genecounts)
+head(Genecounts.df)
+```
+
+9. Import RNA-Seq BAM generated in Exercise2-Q3 using `GenomicAlignments` package
+      + Subset reads overlap with splice junctions
+
+```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
+bamin <- "Data/ENCFF905YGD_chr2.bam"
+ENCFF905YGDAlign <- readGAlignments(bamin)
+ENCFF905YGDAlign[cigarOpTable(cigar(ENCFF905YGDAlign))[,"N"] > 0,]
+```
+
+
+

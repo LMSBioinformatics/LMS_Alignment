@@ -37,7 +37,7 @@ Overview
 Downloading data
 ========================================================
 
-https://fileexchange.imperial.ac.uk/pickup.php?claimID=EBh3VQ3xQKZCcCqY&claimPasscode=g8iANNiTrwdDJiod&emailAddr=gdharmal%40imperial.ac.uk
+https://fileexchange.imperial.ac.uk/pickup.php?claimID=ZHffVJvNFHZmHzP2&claimPasscode=7ZKDxfcdYG2dac8M&emailAddr=gdharmal%40imperial.ac.uk
 
 - Download the zip and unzip under "course" directory (this will create a new directory "Data")
 
@@ -51,13 +51,14 @@ Illumina - Sequencing by synthesis
 
 ![Illumina](./images/Illumina.png)
 
+#### Image Source: Illumina Inc
 
 Introduction to Seqeuncing Technology
 ========================================================
 
 ![Illumina](./images/Illumina2.png)
 
-
+Image Source: Illumina Inc
 
 
 Introduction to Seqeuncing Technology
@@ -230,6 +231,7 @@ Spaced Seed & Extend
 - Seqeucning reads cut into 4 equal parts (read seeds)
 - Seed pairs are used as keys to search the lookup table
 
+#### Image: Nature Biotechnology 2009 27(5): 455-457
 
 Burrows-Wheeler transform (BWT)
 ========================================================
@@ -242,6 +244,7 @@ Burrows-Wheeler transform (BWT)
 - Breakdown approach: First solving simple sub-problem (aligning one base) and use that to solve slighly harder problem (aligning two base)
 - ~30 fold faster than spaced seed methods
 
+#### Image: Nature Biotechnology 2009 27(5): 455-457
 
 Spliced read aligners
 ========================================================
@@ -249,8 +252,8 @@ Spliced read aligners
 ![alignment2](./images/alignment2.jpg)
 
 
-- Aligning transcript reads to genome (reads overlapping with exon-exon junction)
-- With or without known exon-exon junction databases
+- Aligning transcript reads to genome (reads overlapping with splice junction)
+- With or without known splice junction databases
 - Aligners: Tophat, STAR, MapSplice
 
 
@@ -638,7 +641,7 @@ mm9Promoters <- promoters(mm9Genes_subset,upstream=1000,downstream=1000)
 # Reads overlapping with promoters
 CTCFCounts <- countOverlaps(mm9Promoters, SampleAlign)
 
-# Add CTCF counts as elementMetadata to hg19Promoters object
+# Add CTCF counts as elementMetadata to promoters object
 mcols(mm9Promoters)$CTCF <- CTCFCounts
 
 ```
@@ -663,13 +666,15 @@ Overlap Counting - summarizeOverlaps()
 Overlap Counting - summarizeOverlaps()
 ========================================================
 
-### Counting Reads on transcripts for RNA-Seq 
-```{r, echo=TRUE, eval=FALSE, message=FALSE, cache =T, collapse=TRUE}
-transcriptsGR <- transcripts(txdb)
-transcriptsGR <- transcriptsGR[seqnames(transcriptsGR) == "chr1"] # transcripts in chr1
+### Counting Reads on genes for RNA-Seq 
+```{r, echo=TRUE, eval=TRUE, message=FALSE, cache =T, collapse=TRUE}
+
+seqlevels(mm9txdb) <- "1" # Filter for genes in chr1
+mm9ExonsByGene <- exonsBy(mm9txdb, "gene")
+seqlevelsStyle(mm9ExonsByGene) <- "UCSC"  # Add 'chr' to seqnames
 
 BamFilesIn <-  BamFileList("Data/ENCFF905YGD_chr1.bam", yieldSize = 100000)
-TranscriptHits <- summarizeOverlaps(transcriptsGR, BamFilesIn, mode="Union", ignore.strand = T)
+GenetHits <- summarizeOverlaps(mm9ExonsByGene, BamFilesIn, mode="Union", ignore.strand = T)
 
 ```
 
@@ -680,17 +685,17 @@ Overlap Counting - summarizeOverlaps()
 - `summarizeOverlaps` results returned as `SummarizedExperiment` object
 - Counts are accessed with `assays()`
 
-```{r, echo=TRUE, eval=FALSE, message=FALSE, cache =T}
-dim(assays(TranscriptHits)$counts)
-head(assays(TranscriptHits)$counts)
+```{r, echo=TRUE, eval=TRUE, message=FALSE, cache =T}
+dim(assays(GenetHits)$counts)
+head(assays(GenetHits)$counts)
 
 ```
 
 
-Reads on Exon-Exon Junctions
+Reads on splice Junctions
 ========================================================
 
-- How many reads overlapping with exon-exon junctions
+- How many reads overlapping with splice junctions
 ```{r, echo=TRUE, eval=TRUE, message=FALSE, cache =T, collapse=TRUE}
 bamin <- "Data/ENCFF905YGD_chr1.bam"
 SampleRNASeqAlign <- readGAlignments(bamin)
@@ -699,7 +704,7 @@ sum(cigarOpTable(cigar(SampleRNASeqAlign))[,"N"] > 0)
 
 ```
 
-- Inspecting reads overlapping with exon-exon junctions
+- Inspecting reads overlapping with splice junctions
 ```{r, echo=TRUE, eval=TRUE, message=FALSE, cache =T, collapse=TRUE}
 SampleRNASeqAlign[cigarOpTable(cigar(SampleRNASeqAlign))[,"N"] > 0,]
 ```

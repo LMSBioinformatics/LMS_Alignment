@@ -30,13 +30,13 @@ library(Rbowtie)
 library(Rsamtools)
 
 # Building index
-refFasta <- list.files(path="Data",pattern="chr2.fa$", full=T)
-tmp <- bowtie_build(references=refFasta, outdir="Data", prefix="mm9index_chr2", force=TRUE)
+refFasta <- list.files(path="Data",pattern=".fa$", full=T)
+tmp <- bowtie_build(references=refFasta, outdir="Data", prefix="mm9index_chr1chr2", force=TRUE)
 
 # Aligning sequences
-bowtie(sequences="Data/ENCFF001LGM_chr2.fastq",
-       index=file.path("Data", "mm9index_chr2"), 
-       outfile="Data/CTCF_mm9_MF_chr2.sam",
+bowtie(sequences="Data/ENCFF001LGM_chr1_chr2.fastq",
+       index=file.path("Data", "mm9index_chr1chr2"), 
+       outfile="Data/ENCFF001LGM_chr1_chr2.sam",
        sam=TRUE, 
        best=TRUE, 
        force=TRUE,
@@ -48,8 +48,8 @@ bowtie(sequences="Data/ENCFF001LGM_chr2.fastq",
 
 
 # converting SAM to BAM, sorting and indexing
-insam <- "Data/CTCF_mm9_MF_chr2.sam"
-outbam <- "Data/CTCF_mm9_MF_chr2"
+insam <- "Data/ENCFF001LGM_chr1_chr2.sam"
+outbam <- "Data/ENCFF001LGM_chr1_chr2"
 asBam(insam, outbam, overwrite=T)
 
 
@@ -58,7 +58,7 @@ asBam(insam, outbam, overwrite=T)
 
 <br><br>
 
-3. Align "ENCFF905YGD_chr2.fastq" (RNA-Seq of Liver Mus musculus)  `SpliceMap()`
+3. Align "ENCFF905YGD_chr2.fastq" (RNA-Seq of Liver Mus musculus) using `SpliceMap()` against mm9 bowtie index built in Q1
     + Set maximum mismatches allowed in the entire read to 4
     + Use 4 CPU threads to align
     + Report all alignments for each read

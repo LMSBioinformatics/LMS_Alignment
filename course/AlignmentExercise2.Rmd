@@ -28,7 +28,7 @@ output: html_document
     + Visualise the BAM using IGV
 
 
-3. Align "ENCFF905YGD_chr2.fastq" (RNA-Seq of Liver Mus musculus)  `SpliceMap()`
+3. Align "ENCFF905YGD_chr2.fastq" (RNA-Seq of Liver Mus musculus) using `SpliceMap()` against mm9 bowtie index built in Q1
     + Set maximum mismatches allowed in the entire read to 4
     + Use 4 CPU threads to align
     + Report all alignments for each read

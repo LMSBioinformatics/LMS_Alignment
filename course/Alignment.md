@@ -37,7 +37,7 @@ Overview
 Downloading data
 ========================================================
 
-https://fileexchange.imperial.ac.uk/pickup.php?claimID=EBh3VQ3xQKZCcCqY&claimPasscode=g8iANNiTrwdDJiod&emailAddr=gdharmal%40imperial.ac.uk
+https://fileexchange.imperial.ac.uk/pickup.php?claimID=ZHffVJvNFHZmHzP2&claimPasscode=7ZKDxfcdYG2dac8M&emailAddr=gdharmal%40imperial.ac.uk
 
 - Download the zip and unzip under "course" directory (this will create a new directory "Data")
 
@@ -51,13 +51,14 @@ Illumina - Sequencing by synthesis
 
 ![Illumina](./images/Illumina.png)
 
+#### Image Source: Illumina Inc
 
 Introduction to Seqeuncing Technology
 ========================================================
 
 ![Illumina](./images/Illumina2.png)
 
-
+Image Source: Illumina Inc
 
 
 Introduction to Seqeuncing Technology
@@ -259,6 +260,7 @@ Spaced Seed & Extend
 - Seqeucning reads cut into 4 equal parts (read seeds)
 - Seed pairs are used as keys to search the lookup table
 
+#### Image: Nature Biotechnology 2009 27(5): 455-457
 
 Burrows-Wheeler transform (BWT)
 ========================================================
@@ -271,6 +273,7 @@ Burrows-Wheeler transform (BWT)
 - Breakdown approach: First solving simple sub-problem (aligning one base) and use that to solve slighly harder problem (aligning two base)
 - ~30 fold faster than spaced seed methods
 
+#### Image: Nature Biotechnology 2009 27(5): 455-457
 
 Spliced read aligners
 ========================================================
@@ -278,8 +281,8 @@ Spliced read aligners
 ![alignment2](./images/alignment2.jpg)
 
 
-- Aligning transcript reads to genome (reads overlapping with exon-exon junction)
-- With or without known exon-exon junction databases
+- Aligning transcript reads to genome (reads overlapping with splice junction)
+- With or without known splice junction databases
 - Aligners: Tophat, STAR, MapSplice
 
 
@@ -628,7 +631,7 @@ countBam("Data/CTCF_mm9_MF.bam",param=param1)
 
 ```
   space start end width            file records nucleotides
-1    NA    NA  NA    NA CTCF_mm9_MF.bam  967421    34827156
+1    NA    NA  NA    NA CTCF_mm9_MF.bam  967484    34829424
 ```
 
 
@@ -744,7 +747,7 @@ SampleAlign
 ```
 
 ```
-GAlignments object with 967421 alignments and 0 metadata columns:
+GAlignments object with 967484 alignments and 0 metadata columns:
            seqnames strand       cigar    qwidth     start       end
               <Rle>  <Rle> <character> <integer> <integer> <integer>
        [1]     chr1      -         36M        36   3000895   3000930
@@ -753,11 +756,11 @@ GAlignments object with 967421 alignments and 0 metadata columns:
        [4]     chr1      +         36M        36   3000998   3001033
        [5]     chr1      +         36M        36   3001030   3001065
        ...      ...    ...         ...       ...       ...       ...
-  [967417]     chr2      +         36M        36  98507127  98507162
-  [967418]     chr2      -         36M        36  98507272  98507307
-  [967419]     chr2      -         36M        36  98507272  98507307
-  [967420]     chr2      -         36M        36 139690130 139690165
-  [967421]     chr2      +         36M        36 179414086 179414121
+  [967480]     chr1      +         36M        36 197186170 197186205
+  [967481]     chr1      +         36M        36 197188855 197188890
+  [967482]     chr1      -         36M        36 197189171 197189206
+  [967483]     chr1      -         36M        36 197189175 197189210
+  [967484]     chr1      -         36M        36 197192240 197192275
                width     njunc
            <integer> <integer>
        [1]        36         0
@@ -766,13 +769,13 @@ GAlignments object with 967421 alignments and 0 metadata columns:
        [4]        36         0
        [5]        36         0
        ...       ...       ...
-  [967417]        36         0
-  [967418]        36         0
-  [967419]        36         0
-  [967420]        36         0
-  [967421]        36         0
+  [967480]        36         0
+  [967481]        36         0
+  [967482]        36         0
+  [967483]        36         0
+  [967484]        36         0
   -------
-  seqinfo: 2 sequences from an unspecified genome
+  seqinfo: 1 sequence from an unspecified genome
 ```
 
 
@@ -831,7 +834,7 @@ mm9Promoters <- promoters(mm9Genes_subset,upstream=1000,downstream=1000)
 # Reads overlapping with promoters
 CTCFCounts <- countOverlaps(mm9Promoters, SampleAlign)
 
-# Add CTCF counts as elementMetadata to hg19Promoters object
+# Add CTCF counts as elementMetadata to promoters object
 mcols(mm9Promoters)$CTCF <- CTCFCounts
 ```
 
@@ -855,15 +858,16 @@ Overlap Counting - summarizeOverlaps()
 Overlap Counting - summarizeOverlaps()
 ========================================================
 
-### Counting Reads on transcripts for RNA-Seq 
+### Counting Reads on genes for RNA-Seq 
 
 ```r
-transcriptsGR <- transcripts(txdb)
-transcriptsGR <- transcriptsGR[seqnames(transcriptsGR) == "chr1"] # transcripts in chr1
+
+seqlevels(mm9txdb) <- "1" # Filter for genes in chr1
+mm9ExonsByGene <- exonsBy(mm9txdb, "gene")
+seqlevelsStyle(mm9ExonsByGene) <- "UCSC"  # Add 'chr' to seqnames
 
 BamFilesIn <-  BamFileList("Data/ENCFF905YGD_chr1.bam", yieldSize = 100000)
-TranscriptHits <- summarizeOverlaps(transcriptsGR, BamFilesIn, mode="Union", ignore.strand = T)
-
+GenetHits <- summarizeOverlaps(mm9ExonsByGene, BamFilesIn, mode="Union", ignore.strand = T)
 ```
 
 
@@ -875,15 +879,32 @@ Overlap Counting - summarizeOverlaps()
 
 
 ```r
-dim(assays(TranscriptHits)$counts)
-head(assays(TranscriptHits)$counts)
+dim(assays(GenetHits)$counts)
+```
+
+```
+[1] 1950    1
+```
+
+```r
+head(assays(GenetHits)$counts)
+```
+
+```
+                   ENCFF905YGD_chr1.bam
+ENSMUSG00000000544                    1
+ENSMUSG00000000817                    1
+ENSMUSG00000001138                  159
+ENSMUSG00000001143                 1234
+ENSMUSG00000001305                 2496
+ENSMUSG00000001674                 2810
 ```
 
 
-Reads on Exon-Exon Junctions
+Reads on splice Junctions
 ========================================================
 
-- How many reads overlapping with exon-exon junctions
+- How many reads overlapping with splice junctions
 
 ```r
 bamin <- "Data/ENCFF905YGD_chr1.bam"
@@ -893,7 +914,7 @@ sum(cigarOpTable(cigar(SampleRNASeqAlign))[,"N"] > 0)
 [1] 482042
 ```
 
-- Inspecting reads overlapping with exon-exon junctions
+- Inspecting reads overlapping with splice junctions
 
 ```r
 SampleRNASeqAlign[cigarOpTable(cigar(SampleRNASeqAlign))[,"N"] > 0,]
