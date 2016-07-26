@@ -89,6 +89,12 @@ id: SeqQC
 
 Quality Assessment of Sequencing
 ========================================================
+
+### Tools for Alignment & QC
+![Multiplexing](./images/Alignment_flow.jpg)
+
+Quality Assessment of Sequencing
+========================================================
 - Summary
 - Quality score distribtion (5' to 3')
 - Adapter contamination
