@@ -777,8 +777,8 @@ SampleAlign1 &lt;- readGAlignments(bamin,param=param1)</code></pre>
 <li><b>summarizeOverlaps()</b> from <code>GenomicAlignments</code> package</li>
 </ul>
 </div>
-<div id="overlap-counting---countovrelaps" class="section level1">
-<h1>Overlap Counting - countOvrelaps()</h1>
+<div id="overlap-counting---countoverlaps" class="section level1">
+<h1>Overlap Counting - countOverlaps()</h1>
 <ul>
 <li><p><b>countOverlaps()</b> tabulates number of subject intervals overlap with each interval in query, ex: counting number of sequencing reads overlap with genes in RNA-Seq</p></li>
 <li><p>countOverlaps(FeatureGR, AlignmentsGR)</p></li>
@@ -792,8 +792,8 @@ seqlevelsStyle(mm9Genes) &lt;- &quot;UCSC&quot;  # Add 'chr' to seqnames
 mm9Genes_subset &lt;- mm9Genes[seqnames(mm9Genes) == &quot;chr1&quot;] # Genes in chromsome 1</code></pre>
 </div>
 </div>
-<div id="overlap-counting---countovrelaps-1" class="section level1">
-<h1>Overlap Counting - countOvrelaps()</h1>
+<div id="overlap-counting---countoverlaps-1" class="section level1">
+<h1>Overlap Counting - countOverlaps()</h1>
 <pre class="r"><code>mm9Promoters &lt;- promoters(mm9Genes_subset,upstream=1000,downstream=1000)
 
 # Reads overlapping with promoters

@@ -817,7 +817,7 @@ Overlap Counting
 - <b>summarizeOverlaps()</b> from `GenomicAlignments` package
 
 
-Overlap Counting - countOvrelaps()
+Overlap Counting - countOverlaps()
 ========================================================
 
 - <b>countOverlaps()</b> tabulates number of subject intervals overlap with each interval in query, ex: counting number of sequencing reads overlap with genes in RNA-Seq
@@ -836,7 +836,7 @@ mm9Genes_subset <- mm9Genes[seqnames(mm9Genes) == "chr1"] # Genes in chromsome 1
 ```
 
 
-Overlap Counting - countOvrelaps()
+Overlap Counting - countOverlaps()
 ========================================================
 
 
