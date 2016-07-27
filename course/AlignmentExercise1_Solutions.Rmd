@@ -13,7 +13,7 @@ output: html_document
 
 # Solutions
 
-1. Read "ENCFF001LGM_chr2.fastq" fastq file using `ShortRead` package
+1. Read "ENCFF001LGM_chr1_chr2.fastq" fastq file using `ShortRead` package
     + What is the read length of the sequencing reads?
     + How many sequencing reads are in this fastq?
     + Plot the distribution of quality scores using `boxplot()` function (convert ASCII encoded values into matrix using `as(QualityValues, "matrix")` )
@@ -23,7 +23,7 @@ output: html_document
     
 ```{r, echo=TRUE, eval=TRUE, message=FALSE, collapse=TRUE, cache=TRUE}
 library(ShortRead)
-FastqIn <- "Data/ENCFF001LGM_chr2.fastq"
+FastqIn <- "Data/ENCFF001LGM_chr1_chr2.fastq"
 fq <- readFastq(FastqIn)
 
 # Read length and Number of sequences
