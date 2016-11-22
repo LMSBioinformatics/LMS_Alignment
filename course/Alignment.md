@@ -34,7 +34,7 @@ Overview
 Downloading data
 ========================================================
 
-https://fileexchange.imperial.ac.uk/pickup.php?claimID=ZHffVJvNFHZmHzP2&claimPasscode=7ZKDxfcdYG2dac8M&emailAddr=gdharmal%40imperial.ac.uk
+https://fileexchange.imperial.ac.uk/pickup.php?claimID=T3eei7jDEorDnrCf&claimPasscode=29FSJPJ5PCYPJB8H&emailAddr=gdharmal%40ic.ac.uk
 
 - Download the zip and unzip under "course" directory (this will create a new directory "Data")
 
@@ -1009,15 +1009,15 @@ other attached packages:
  [9] GenomeInfoDb_1.6.3         Biostrings_2.38.3         
 [11] XVector_0.10.0             IRanges_2.4.8             
 [13] S4Vectors_0.8.11           BiocParallel_1.4.3        
-[15] BiocGenerics_0.16.1        knitr_1.12                
+[15] BiocGenerics_0.16.1        knitr_1.14                
 
 loaded via a namespace (and not attached):
  [1] magrittr_1.5         zlibbioc_1.16.0      lattice_0.20-33     
- [4] stringr_1.0.0        hwriter_1.3.2        tools_3.2.3         
+ [4] stringr_1.1.0        hwriter_1.3.2        tools_3.2.3         
  [7] grid_3.2.3           latticeExtra_0.6-28  lambda.r_1.1.9      
-[10] futile.logger_1.4.1  digest_0.6.9         RColorBrewer_1.1-2  
+[10] futile.logger_1.4.1  digest_0.6.10        RColorBrewer_1.1-2  
 [13] formatR_1.4          futile.options_1.0.0 bitops_1.0-6        
-[16] RCurl_1.95-4.8       evaluate_0.8         stringi_1.1.1       
+[16] RCurl_1.95-4.8       evaluate_0.10        stringi_1.1.2       
 [19] XML_3.98-1.4        
 ```
 
