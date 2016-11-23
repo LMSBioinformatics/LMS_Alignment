@@ -523,8 +523,8 @@ ChIP-Seq QC
 - Estimation of Fragment Length
 - Cross-Coverage score at the fragment length
 - Cross-coverage score at the fragment length over Cross-coverage at the read length
-- Percentage of reads wthin peaks
-- Percentage of reads wthin Blacklist regions
+- Percentage of reads within peaks
+- Percentage of reads within Blacklist regions
 
 <br><br><br>
 ## R package: ChIPQC (https://bioconductor.org/packages/release/bioc/html/ChIPQC.html)
